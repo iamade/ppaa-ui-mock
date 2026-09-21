@@ -1,0 +1,62 @@
+:root{
+  --bg:#0d1117; --panel:#111823; --panel2:#0f141d; --line:#1f2a37;
+  --text:#e6edf3; --muted:#8b98a5; --accent:#4c8dff; --accent-ink:#0b1220;
+  --ok:#3fb950; --warn:#d29922; --danger:#f85149;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:16px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{font-weight:650;letter-spacing:.02em}
+.brand .accent{color:var(--accent)}
+.agent-select{display:flex;align-items:center;gap:8px}
+.agent-select label{color:var(--muted);font-size:13px}
+select{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:inherit}
+.meta{margin-left:auto;display:flex;gap:8px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--muted);background:var(--panel2)}
+.shell{flex:1;display:grid;grid-template-columns:220px 1fr 300px;min-height:0}
+.rail,.drawer,.chat{padding:14px;min-height:0}
+.rail{background:var(--panel2);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.rail h2,.chat h2,.drawer h2{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+#roster{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+#roster li{display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+#roster li.active{border-color:var(--accent)}
+.avatar{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:13px;font-weight:650;color:var(--accent-ink);background:var(--accent);flex:none}
+.who{display:flex;flex-direction:column}
+.who .name{font-weight:600}
+.who .status{font-size:12px;color:var(--muted)}
+.rail-note,.drawer-note{font-size:12px;color:var(--muted);margin-top:auto}
+.chat{display:flex;flex-direction:column;gap:10px}
+#messages{flex:1;display:flex;flex-direction:column;gap:12px;overflow:auto}
+.msg{display:flex;gap:10px}
+.msg .avatar{width:28px;height:28px;border-radius:7px;font-size:12px}
+.msg .bubble{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px;max-width:72ch}
+.msg .bubble header{font-size:12px;color:var(--muted);display:flex;gap:8px;margin-bottom:4px}
+.msg .bubble header .provider{border:1px solid var(--line);border-radius:999px;padding:0 8px}
+.msg.user .bubble{background:#161d29}
+.composer{display:flex;gap:8px}
+.composer input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--text);font:inherit}
+.composer input:disabled,.composer button:disabled{opacity:.55}
+.composer button{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600}
+.drawer{background:var(--panel2);border-left:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+#approvals{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.card .title{font-weight:600}
+.card .detail{font-size:13px;color:var(--muted)}
+.card .risk{font-size:12px}
+.card .risk.low{color:var(--ok)} .card .risk.medium{color:var(--warn)} .card .risk.high{color:var(--danger)}
+.card .actions{display:flex;gap:8px}
+.card .actions button{flex:1;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:7px 0;font:inherit;font-weight:600}
+.card .actions button.approve{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.foot{padding:8px 16px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;background:var(--panel)}
+.foot a{color:var(--accent);text-decoration:none}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}
+  .rail{border-right:0;border-bottom:1px solid var(--line)}
+  .rail-note{display:none}
+  #roster{flex-direction:row;overflow:auto}
+  .drawer{border-left:0;border-top:1px solid var(--line)}
+  .drawer-note{margin-top:0}
+  .msg .bubble{max-width:100%}
+  .meta{display:none}
+}
