@@ -1,0 +1,14 @@
+# Screenshot sizes (regenerated every screenshot pass via `sips -g pixelWidth -g pixelHeight`)
+#
+# Source: live site https://iamade.github.io/ppaa-ui-mock/v3/ (which includes the
+# 9499f39 approval code-block fix). Captured 2026-09-26 against the live site.
+
+01-home-desktop.png            1440x900
+02-talk-desktop.png            1440x900
+03-approvals-desktop.png       1440x900
+04-memory-desktop.png          1440x900
+05-settings-desktop.png        1440x900
+06-welcome-desktop.png         1440x900
+07-home-mobile.png             390x844
+08-talk-mobile.png             390x844
+09-approvals-mobile.png        390x844
