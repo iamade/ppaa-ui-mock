@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" dark">
+<title>PPAA — your team of agents (mock v3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============== TOP BAR (always visible) ============== -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M5 19V5l7 7 7-7v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">PPAA</div>
+      <div class="brand-sub muted">your team of agents</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <div class="search" role="search">
+      <span class="ico-search" aria-hidden="true">⌕</span>
+      <input placeholder="Search agents, approvals, memory…" id="global-search" autocomplete="off">
+      <kbd>⌘K</kbd>
+    </div>
+    <div class="env-chip" title="Hosted by PPAA">
+      <span class="dot ok"></span>Hosted
+    </div>
+    <button class="avatar-btn" data-route="settings" title="Settings" id="me-avatar"></button>
+  </div>
+</header>
+
+<div class="app">
+
+<!-- ============== LEFT RAIL (desktop) / BOTTOM NAV (mobile) ============== -->
+<nav class="rail" id="rail" aria-label="Primary">
+  <div class="rail-group">
+    <a href="#home"        data-nav="home"        class="rail-item"><span class="ico">⌂</span><span>Agents</span></a>
+    <a href="#talk"        data-nav="talk"        class="rail-item"><span class="ico">◐</span><span>Talk</span></a>
+    <a href="#approvals"   data-nav="approvals"   class="rail-item"><span class="ico">✓</span><span>Approvals</span><span class="count" id="approval-count">3</span></a>
+    <a href="#memory"      data-nav="memory"      class="rail-item"><span class="ico">◌</span><span>Memory</span></a>
+    <a href="#settings"    data-nav="settings"    class="rail-item"><span class="ico">✦</span><span>Settings</span></a>
+  </div>
+  <div class="rail-foot">
+    <button class="rail-new" data-route="welcome" title="Add agent">
+      <span class="ico">+</span><span>New agent</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ============== MAIN ============== -->
+<main class="main">
+
+<!-- ============ 1. WELCOME / ONBOARDING ============ -->
+<section id="view-welcome" class="view">
+  <div class="welcome-wrap">
+    <div class="welcome-aside">
+      <p class="eyebrow">Set up · takes 30 seconds</p>
+      <h1>Choose your first agent</h1>
+      <p class="muted lead">Every PPAA agent has a face and a voice you pick. Pick a person, an animal, a robot, or upload your own photo.</p>
+
+      <div class="stage" id="welcome-stage">
+        <div class="portrait-wrap">
+          <div class="portrait-ring" id="welcome-ring"></div>
+          <div class="portrait" id="welcome-preview"></div>
+          <div class="state-pill" id="welcome-state">
+            <span class="state-dot" data-state="idle"></span><span>Idle</span>
+          </div>
+        </div>
+        <h2 id="welcome-preview-name" class="big-name">Ada</h2>
+        <div class="muted small" id="welcome-preview-meta">Warm voice · Everyday helper</div>
+        <button class="btn primary" data-action="preview-voice">▶ Preview voice</button>
+      </div>
+    </div>
+
+    <div class="welcome-panel">
+      <div class="card">
+        <div class="card-head">
+          <h3>Pick a persona</h3>
+          <span class="muted small">Default is human</span>
+        </div>
+        <div class="persona-grid" id="persona-grid"></div>
+        <label class="upload-tile" data-action="upload">
+          <input type="file" accept="image/*" hidden>
+          <div class="avatar dashed">⬆</div>
+          <div>
+            <div class="strong">Use my photo</div>
+            <div class="muted small">PNG or JPG, stored only on this device</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="card">
+        <label class="small muted" for="agent-name">Name your agent</label>
+        <input id="agent-name" value="Ada" maxlength="24" autocomplete="off">
+
+        <label class="small muted">Voice</label>
+        <div class="chip-row" id="voice-chips">
+          <button class="chip on" data-voice="Warm"><span class="chip-dot warm"></span>Warm</button>
+          <button class="chip"    data-voice="Calm"><span class="chip-dot calm"></span>Calm</button>
+          <button class="chip"    data-voice="Bright"><span class="chip-dot bright"></span>Bright</button>
+        </div>
+
+        <label class="small muted">Role</label>
+        <div class="chip-row" id="role-chips">
+          <button class="chip on" data-role="Everyday helper">Everyday helper</button>
+          <button class="chip"    data-role="Coder">Coder</button>
+          <button class="chip"    data-role="Researcher">Researcher</button>
+          <button class="chip"    data-role="Writer">Writer</button>
+        </div>
+
+        <button class="btn primary block" data-action="create-agent">Meet <span id="create-name">Ada</span> →</button>
+        <button class="btn ghost block" data-action="skip-welcome">I already have agents</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. HOME / MY AGENTS ============ -->
+<section id="view-home" class="view">
+  <div class="page-head">
+    <div>
+      <h1>My agents</h1>
+      <p class="muted" id="home-sub">3 actions waiting for your OK.</p>
+    </div>
+    <div class="row">
+      <button class="btn sm" data-action="filter-agents" data-filter="all">All</button>
+      <button class="btn sm ghost" data-action="filter-agents" data-filter="working">Working</button>
+      <button class="btn sm ghost" data-action="filter-agents" data-filter="approval">Need OK</button>
+      <button class="btn primary" data-route="welcome">+ New agent</button>
+    </div>
+  </div>
+
+  <div class="agent-grid" id="agent-grid"></div>
+
+  <div class="card team-card">
+    <div class="card-head">
+      <h3>Team channel</h3>
+      <button class="btn sm" data-action="toast" data-msg="Team channel: agent↔agent messages would appear here (agentmesh /messages/history).">View history</button>
+    </div>
+    <p class="muted small">Your agents can talk to each other. You always see it.</p>
+    <div class="team-feed" id="team-feed"></div>
+  </div>
+</section>
+
+<!-- ============ 3. TALK ============ -->
+<section id="view-talk" class="view">
+  <div class="talk-head">
+    <div class="agent-switch" id="talk-switch" role="tablist"></div>
+    <div class="talk-tools">
+      <button class="btn sm ghost" data-action="toast" data-msg="New session started. Transcripts are stored per agent and you can clear them anytime.">New session</button>
+    </div>
+  </div>
+
+  <div class="talk-grid">
+    <!-- LEFT: agent panel -->
+    <aside class="talk-side">
+      <div class="stage">
+        <div class="portrait-wrap">
+          <div class="portrait-ring" id="talk-ring"></div>
+          <div class="portrait" id="talk-avatar"></div>
+          <div class="state-pill" id="talk-state">
+            <span class="state-dot" data-state="idle"></span><span id="talk-state-label">Idle</span>
+          </div>
+        </div>
+        <h2 id="talk-name" class="big-name">Ada</h2>
+        <div class="muted small" id="talk-role">Everyday helper · Warm voice</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Active task</h3></div>
+        <div id="active-task">
+          <div class="muted small">No active task. Ask <span id="active-task-name">Ada</span> something.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Memory peek</h3><button class="btn sm" data-route="memory">Open</button></div>
+        <ul class="peek-list" id="memory-peek"></ul>
+      </div>
+    </aside>
+
+    <!-- RIGHT: conversation -->
+    <section class="talk-main">
+      <header class="conv-head">
+        <div>
+          <div class="conv-title" id="conv-title">Conversation with Ada</div>
+          <div class="muted small" id="conv-sub">Started just now</div>
+        </div>
+        <div class="conv-tools">
+          <button class="icon-btn" data-action="toast" data-msg="Transcript downloaded (mock)." title="Export">⬇</button>
+          <button class="icon-btn" data-action="toast" data-msg="Transcript cleared." title="Clear">⌫</button>
+        </div>
+      </header>
+
+      <div class="transcript" id="transcript" aria-live="polite"></div>
+
+      <div class="composer">
+        <div class="composer-tools" id="composer-tools">
+          <button class="tool-chip" data-action="toast" data-msg="Attach: a file picker would open (mock).">📎 Attach</button>
+          <button class="tool-chip" data-action="talk-tool-demo">🔧 Add tool</button>
+          <button class="tool-chip" data-action="toast" data-msg="Web search enabled for this turn (mock).">🌐 Search</button>
+        </div>
+        <div class="composer-row">
+          <button class="mic" id="mic" aria-label="Hold to talk"><span class="mic-ico">🎙</span></button>
+          <textarea id="talk-input" rows="1" placeholder="Type or hold the mic to talk…" autocomplete="off"></textarea>
+          <button class="btn primary" data-action="send">Send</button>
+        </div>
+        <div class="composer-status muted small" id="composer-status">Idle</div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- ============ 4. APPROVALS ============ -->
+<section id="view-approvals" class="view">
+  <div class="page-head">
+    <div>
+      <h1>Approvals</h1>
+      <p class="muted">Your agents ask before doing anything that touches your machine, money, or the outside world.</p>
+    </div>
+    <div class="row">
+      <button class="chip on" data-filter="all">All <span class="chip-num" id="filter-count-all">3</span></button>
+      <button class="chip"    data-filter="high">High <span class="chip-num" id="filter-count-high">1</span></button>
+      <button class="chip"    data-filter="med">Medium <span class="chip-num" id="filter-count-med">1</span></button>
+      <button class="chip"    data-filter="low">Low <span class="chip-num" id="filter-count-low">1</span></button>
+    </div>
+  </div>
+
+  <div class="stack" id="approval-list"></div>
+
+  <div class="card policy-card">
+    <div class="card-head"><h3>Approval policy</h3></div>
+    <div class="setting"><div><div class="strong">Auto-approve low-risk reads</div><div class="muted small">Reading files & web pages won't ask. Writes always ask.</div></div><button class="toggle on" data-toggle="autolow" aria-label="Auto-approve low-risk"></button></div>
+    <div class="setting"><div><div class="strong">Auto-approve same-tool repeats (10 min)</div><div class="muted small">If you approved the same exact call moments ago, don't ask again.</div></div><button class="toggle on" data-toggle="repeat"></button></div>
+    <div class="setting"><div><div class="strong">Ask before spending money</div><div class="muted small">Always, regardless of other rules.</div></div><button class="toggle on" data-toggle="money"></button></div>
+    <div class="setting"><div><div class="strong">Send me a daily summary of what ran</div><div class="muted small">A short digest of approved actions and outcomes.</div></div><button class="toggle" data-toggle="summary"></button></div>
+  </div>
+</section>
+
+<!-- ============ 5. MEMORY ============ -->
+<section id="view-memory" class="view">
+  <div class="page-head">
+    <div>
+      <h1>What <span id="memory-name">Ada</span> knows about you</h1>
+      <p class="muted">Everything here was learned from your conversations. Edit or delete anything — it changes what the agent remembers.</p>
+    </div>
+    <div class="row">
+      <div class="agent-switch inline" id="memory-switch" role="tablist"></div>
+    </div>
+  </div>
+
+  <div class="mem-toolbar">
+    <div class="muted small"><span id="mem-count">3</span> items · <span id="mem-source">Learned from 8 conversations</span></div>
+    <div class="row">
+      <input id="mem-search" placeholder="Filter…" autocomplete="off">
+      <button class="btn sm ghost" data-action="toast" data-msg="Export started: a JSON file would download (mock).">Export</button>
+    </div>
+  </div>
+
+  <div class="stack" id="memory-list"></div>
+
+  <div class="card stack">
+    <div class="card-head"><h3>Teach them something</h3></div>
+    <textarea id="memory-new" placeholder='e.g. "I prefer short answers — no preamble."'></textarea>
+    <div class="row">
+      <button class="btn primary" data-action="memory-add">Remember this</button>
+      <button class="btn bad ghost" data-action="memory-forget-all">Forget everything</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. SETTINGS ============ -->
+<section id="view-settings" class="view">
+  <div class="page-head">
+    <div>
+      <h1>Settings</h1>
+      <p class="muted">Everything that isn't an agent, a conversation, an approval, or memory.</p>
+    </div>
+  </div>
+
+  <div class="settings-grid">
+    <div class="stack">
+      <div class="card">
+        <div class="card-head"><h3>Brains (models)</h3></div>
+        <p class="muted small">Who powers your agents' thinking.</p>
+        <div class="opt-grid">
+          <div class="opt on" data-model="hosted"><div class="opt-title">PPAA-hosted</div><div class="muted small">Zero setup. Free tier + paid plans.</div></div>
+          <div class="opt" data-model="byo"><div class="opt-title">Bring your own key</div><div class="muted small">OpenAI, Anthropic, Qwen, Ollama, local.</div></div>
+        </div>
+        <div id="byo-fields" class="stack hidden" style="margin-top:10px">
+          <input placeholder="sk-… (stored only on this device)">
+          <button class="btn sm" data-action="toast" data-msg="Key saved locally (mock).">Save key</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Voice & speech</h3></div>
+        <div class="setting"><span>Realtime voice</span><button class="toggle on" data-toggle="voice"></button></div>
+        <div class="setting"><span>Speak replies aloud</span><button class="toggle on" data-toggle="tts"></button></div>
+        <div class="setting"><span>Wake word ("Hey Ada")</span><button class="toggle" data-toggle="wake"></button></div>
+        <div class="setting"><span>Show live waveform while listening</span><button class="toggle on" data-toggle="wave"></button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Memory</h3></div>
+        <div class="setting"><span>Keep memory on this device only</span><button class="toggle on" data-toggle="localmem"></button></div>
+        <div class="setting"><span>Auto-capture useful facts from conversations</span><button class="toggle on" data-toggle="autocapture"></button></div>
+        <div class="setting"><span>Forget everything across all agents</span><button class="btn sm bad" data-action="toast" data-msg="This would wipe memory for every agent on this account (mock).">Wipe all</button></div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="card">
+        <div class="card-head"><h3>Get PPAA on your desktop</h3></div>
+        <p class="muted small">Same agents, same memory. Desktop unlocks file access and offline avatars.</p>
+        <div class="stack">
+          <button class="btn block" data-action="download" data-os="macOS">Download for Mac</button>
+          <button class="btn block" data-action="download" data-os="Windows">Download for Windows</button>
+          <button class="btn block" data-action="download" data-os="Linux">Download for Linux</button>
+        </div>
+        <p class="muted small" style="margin-top:10px">Web version: you're using it now. iPhone & Android coming.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Privacy</h3></div>
+        <div class="setting"><span>Share anonymous usage stats</span><button class="toggle" data-toggle="stats"></button></div>
+        <div class="setting"><span>Let agents message each other</span><button class="toggle on" data-toggle="mesh"></button></div>
+        <button class="btn block" data-action="toast" data-msg="Export requested — a ZIP would download (mock)." style="margin-top:10px">Export all my data</button>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Account</h3></div>
+        <div class="setting"><span>Signed in as</span><span class="muted">ade@peopleprotocol.app</span></div>
+        <div class="setting"><span>Plan</span><span class="muted">Free · upgrade for hosted models</span></div>
+        <button class="btn block" data-action="toast" data-msg="Signed out (mock)." style="margin-top:10px">Sign out</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-note">PPAA harness mock v3 · Tobi · 2026-09-26 · no data leaves this page · <span class="muted">portraits: AI-illustrated, no real likenesses</span></p>
+</section>
+
+</main>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
