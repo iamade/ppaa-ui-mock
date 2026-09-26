@@ -68,7 +68,7 @@ p{margin:0 0 10px;line-height:1.55;color:var(--text-2)}
 /* ============ APP LAYOUT ============ */
 .app{display:grid;grid-template-columns:var(--rail-w) 1fr;min-height:calc(100dvh - var(--top-h))}
 .main{padding:20px 24px 80px;max-width:1280px;width:100%;margin:0 auto}
-@media(max-width:900px){.app{grid-template-columns:1fr}.main{padding:14px 14px 96px}}
+@media(max-width:900px){.app{grid-template-columns:1fr}.main{padding:14px 14px calc(110px + env(safe-area-inset-bottom))}}
 
 /* ============ RAIL (left nav) ============ */
 .rail{position:sticky;top:var(--top-h);align-self:start;height:calc(100dvh - var(--top-h));background:var(--bg-1);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px;gap:14px;overflow:auto}
@@ -143,8 +143,19 @@ p{margin:0 0 10px;line-height:1.55;color:var(--text-2)}
 
 /* ============ PORTRAIT (the avatar visual) ============ */
 .portrait-wrap{position:relative;width:200px;height:200px;display:grid;place-items:center}
-.portrait{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--bg-3);border:3px solid var(--line);position:relative;transition:border-color .2s,transform .2s}
+/* Standalone default (agent cards etc.); sized wrappers override to 100% below */
+.portrait{width:120px;height:120px;border-radius:50%;overflow:hidden;background:var(--bg-3);border:3px solid var(--line);position:relative;transition:border-color .2s,transform .2s}
+.portrait-wrap .portrait,
+.avatar .portrait,
+.avatar-sm .portrait,
+.avatar-md .portrait,
+.avatar-lg .portrait,
+.avatar-xl .portrait,
+.avatar-btn .portrait{width:100%;height:100%}
 .portrait svg{width:100%;height:100%;display:block}
+/* human (photoreal) portraits fill the round container */
+.portrait .portrait-fill{position:absolute;inset:0;width:100%;height:100%;display:block}
+.portrait .portrait-img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;background:var(--bg-3)}
 .portrait-ring{position:absolute;inset:-6px;border-radius:50%;border:1.5px dashed var(--line);pointer-events:none;transition:border-color .2s}
 .state-pill{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:6px;background:var(--bg-1);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--text-2);white-space:nowrap;z-index:2}
 .state-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}

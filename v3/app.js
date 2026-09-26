@@ -19,9 +19,12 @@
 (function () {
   'use strict';
 
-  // ============ PORTRAITS (SVG, original illustrations) ============
-  // Human portraits are the v3 default (per Ade 2026-09-21 + Plan §1, §8).
-  // Each is an original illustration; no real likenesses. SVGs are tiny and crisp at any size.
+  // ============ PORTRAITS (photoreal AI-generated, fictional people) ============
+  // v3 fix pass 2026-09-26: replaced inline SVG human illustrations with
+  // photoreal AI-generated headshots for the four default human personas
+  // (Ada / Marcus / Helena / Arjun). All images are fictional people, no real
+  // likenesses. See assets/portraits/LICENCE.md.
+  // Animal/robot personas stay as original inline SVG (Plan §1 — optional).
   const SVG_NS = 'http://www.w3.org/2000/svg';
   function el(tag, attrs, children) {
     const e = document.createElementNS(SVG_NS, tag);
@@ -29,8 +32,19 @@
     if (children) children.forEach(c => e.appendChild(c));
     return e;
   }
-  // Build a portrait: bg gradient + simplified human shape, skin/hair/clothing per spec.
-  // All faces are gender-neutral / stylized (no specific real person).
+  // Build a portrait: photoreal <img> for humans, SVG for animal/robot.
+  // Humans use assets/portraits/<name>.jpg (fictional AI-generated people).
+  function portraitImg({src, alt}) {
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt || '';
+    img.loading = 'eager';
+    img.decoding = 'async';
+    img.draggable = false;
+    img.className = 'portrait-img';
+    return img;
+  }
+  // Legacy SVG builder (kept for animal/robot personas only).
   function portraitSvg({skin='#caa68a', hair='#2b1b12', hairStyle='short', cloth='#1f3a4d', collar='round', glasses=false, accent='#f5a524', id}){
     const w = 200, h = 200;
     const svg = el('svg', {viewBox:'0 0 200 200', xmlns:SVG_NS});
@@ -137,11 +151,12 @@
   }
 
   // PERSONAS registry. v3 default = humans (per Ade 2026-09-21 / Plan §1).
+  // Humans use photoreal AI-generated portraits (assets/portraits/*.jpg).
   const PERSONAS = {
-    ada:      { label:'Ada',      kind:'human', build: () => portraitSvg({skin:'#caa68a', hair:'#2b1b12', hairStyle:'curly', cloth:'#163a4a', collar:'crew',   accent:'#f5a524', id:'p1'}) },
-    marcus:   { label:'Marcus',   kind:'human', build: () => portraitSvg({skin:'#7a5238', hair:'#0e0808', hairStyle:'fade',  cloth:'#2a2a2a', collar:'crew',   accent:'#f5a524', id:'p2'}) },
-    helena:   { label:'Helena',   kind:'human', build: () => portraitSvg({skin:'#d4b08a', hair:'#3a2a1a', hairStyle:'wavy',  cloth:'#1b2541', collar:'crew',   glasses:true, accent:'#f5a524', id:'p3'}) },
-    arjun:    { label:'Arjun',    kind:'human', build: () => portraitSvg({skin:'#b88a64', hair:'#3a2418', hairStyle:'short', cloth:'#1f3a24', collar:'crew',   accent:'#f5a524', id:'p4'}) },
+    ada:      { label:'Ada',      kind:'human', build: () => portraitImg({src:'assets/portraits/ada.jpg',    alt:'Ada (fictional portrait, AI-generated)'}) },
+    marcus:   { label:'Marcus',   kind:'human', build: () => portraitImg({src:'assets/portraits/marcus.jpg', alt:'Marcus (fictional portrait, AI-generated)'}) },
+    helena:   { label:'Helena',   kind:'human', build: () => portraitImg({src:'assets/portraits/helena.jpg', alt:'Helena (fictional portrait, AI-generated)'}) },
+    arjun:    { label:'Arjun',    kind:'human', build: () => portraitImg({src:'assets/portraits/arjun.jpg',  alt:'Arjun (fictional portrait, AI-generated)'}) },
     // optional (kept from v2, but not the default)
     fox:      { label:'Fox',      kind:'animal', build: foxSvg },
     owl:      { label:'Owl',      kind:'animal', build: owlSvg },
@@ -239,7 +254,17 @@
     wrap.className = 'portrait';
     wrap.dataset.state = a.status;
     const p = (PERSONAS[a.persona] || PERSONAS.ada);
-    wrap.appendChild(p.build());
+    const inner = p.build();
+    // For human (img) portraits, wrap with a `.portrait-fill` so the <img>
+    // fills the round .portrait container without breaking the state border.
+    if (p.kind === 'human') {
+      const fill = document.createElement('div');
+      fill.className = 'portrait-fill';
+      fill.appendChild(inner);
+      wrap.appendChild(fill);
+    } else {
+      wrap.appendChild(inner);
+    }
     return wrap;
   }
   function avatarHTML(a) {
@@ -406,7 +431,6 @@
     a.status = state; save('agents', agents);
     $('#talk-avatar').dataset.state = state;
     $('#talk-ring').dataset.state = state;
-    $('#talk-stage').dataset.state = state;
     const pill = $('#talk-state');
     pill.querySelector('.state-dot').dataset.state = state;
     pill.querySelector('#talk-state-label').textContent = STATE_LABEL[state] || 'Idle';
@@ -419,12 +443,10 @@
     $('#talk-avatar').appendChild((PERSONAS[a.persona]||PERSONAS.ada).build());
     $('#talk-avatar').dataset.state = a.status;
     $('#talk-ring').dataset.state = a.status;
-    $('#talk-stage').dataset.state = a.status;
     $('#talk-name').textContent = a.name;
     $('#talk-role').textContent = `${a.role} · ${a.voice} voice`;
     const ct = $('#conv-title'); if (ct) ct.textContent = `Conversation with ${a.name}`;
     const cs = $('#conv-sub');  if (cs) cs.textContent  = `${a.role} · ${a.voice} voice · started just now`;
-    $('#active-task-name').textContent = a.name;
     // state pill
     const pill = $('#talk-state');
     pill.querySelector('.state-dot').dataset.state = a.status;
@@ -759,7 +781,7 @@
     }
     if (d.role) { draft.role = d.role; $$('#role-chips .chip').forEach(c => c.classList.toggle('on', c === el)); $('#welcome-preview-meta').textContent = `${VOICE_LABEL[d.voice]} · ${draft.role}`; return; }
     if (d.open) { currentAgent = d.open; save('current', currentAgent); return go('talk'); }
-    if (d.pick) { currentAgent = d.pick; save('current', currentAgent); return route(); }
+    if (d.pick) { currentAgent = d.pick; save('current', currentAgent); renderTalk(); return; }
     if (d.tool) {
       const t = ensureTranscript(currentAgent); const m = t[+d.i];
       if (d.tool === 'edit') {
